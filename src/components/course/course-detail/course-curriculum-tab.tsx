@@ -1,15 +1,6 @@
 import { FC } from "react";
 import { LabDetailCard } from "./lab-detail-card";
-
-interface Lab {
-  id: number;
-  title: string;
-  short_description?: string;
-  description?: string;
-  duration?: string;
-  difficulty?: string;
-  order?: number;
-}
+import { Lab } from "@/types/lab";
 
 interface CourseCurriculumTabProps {
   labs: Lab[];

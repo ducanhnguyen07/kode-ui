@@ -427,7 +427,7 @@ const StartLab: FC = () => {
             disabled={isStarting}
             className="flex-1 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-blue-300"
           >
-            {isStarting ? "Đang xử lý..." : "Bắt đầu Lab"}
+            {isStarting ? "Đang xử lý..." : "Bắt đầu làm bài thực hành"}
           </button>
         </div>
       </div>

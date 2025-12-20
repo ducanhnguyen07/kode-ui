@@ -1,20 +1,8 @@
-// components/course-detail/LabDetailCard.tsx
 import { FC, useState } from "react";
 import { Link } from "react-router-dom";
-
 import { Button } from "@/components/ui/button";
-import { Badge } from "./badge";
 import { TiptapViewer } from "./tip-tap-viewer";
-
-interface Lab {
-  id: number;
-  title: string;
-  short_description?: string;
-  description?: string;
-  duration?: string;
-  difficulty?: string;
-  order?: number;
-}
+import { Lab } from "@/types/lab";
 
 interface LabDetailCardProps {
   lab: Lab;
@@ -44,28 +32,27 @@ export const LabDetailCard: FC<LabDetailCardProps> = ({
         </div>
         <FlaskConical className="text-blue-500" />
         <div className="flex-1">
-          <p className="font-medium">{lab.title}</p>
-          {lab.short_description && (
-            <p className="text-sm text-gray-500">{lab.short_description}</p>
-          )}
+          <h3 className="font-medium">{lab.title}</h3>
         </div>
         <div className="flex items-center gap-3">
-          {lab.duration && (
-            <span className="text-sm text-gray-500">⏱️ {lab.duration}</span>
+          {lab.estimatedTime && (
+            <span className="text-sm text-gray-500">
+              ⏱️ {lab.estimatedTime} phút
+            </span>
           )}
-          {lab.difficulty && <Badge variant="outline">{lab.difficulty}</Badge>}
           <span className="text-gray-400">{isExpanded ? "▼" : "▶"}</span>
         </div>
       </div>
 
-      {isExpanded && lab.description && (
-        <div className="border-t bg-gray-50 p-6">
-          <TiptapViewer content={lab.description} />
+      {isExpanded && (
+        <div className="space-y-4 border-t bg-gray-50 p-6">
+          {lab.description && <TiptapViewer content={lab.description} />}
+
           <Link
             to={`/courses/${courseId}/labs/${lab.id}/start`}
-            className="mt-4 inline-block"
+            className="inline-block"
           >
-            <Button size="sm">Bắt đầu lab này</Button>
+            <Button size="sm">Bắt đầu làm bài thực hành</Button>
           </Link>
         </div>
       )}

@@ -1,58 +1,41 @@
+import { User } from "@/types/user";
 import { FC } from "react";
-
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 interface CourseMetadataProps {
-  instructor?: string;
-  duration?: string;
+  lecturer?: User;
   studentsCount?: number;
-  rating?: number;
-  lastUpdated?: string;
-  lifetimeAccess?: boolean;
+  updatedAt?: string;
 }
 
 export const CourseMetadata: FC<CourseMetadataProps> = ({
-  instructor,
-  duration,
+  lecturer,
   studentsCount,
-  rating,
-  lastUpdated,
-  lifetimeAccess,
+  updatedAt,
 }) => {
   return (
     <div className="mb-6 flex flex-wrap gap-6 text-sm text-gray-500">
-      {instructor && (
+      {lecturer && (
         <div className="flex items-center gap-2">
           <span>👨‍🏫</span>
-          <span>{instructor}</span>
+          <span>{lecturer.lastName + " " + lecturer.firstName}</span>
         </div>
       )}
-      {duration && (
-        <div className="flex items-center gap-2">
-          <span>⏱️</span>
-          <span>{duration}</span>
-        </div>
-      )}
+
       {studentsCount !== undefined && (
         <div className="flex items-center gap-2">
           <span>👥</span>
-          <span>{studentsCount.toLocaleString()} học viên</span>
+          <span>{studentsCount} học viên</span>
         </div>
       )}
-      {rating && (
-        <div className="flex items-center gap-2">
-          <span>⭐</span>
-          <span>{rating.toFixed(1)}</span>
-        </div>
-      )}
-      {lastUpdated && (
+
+      {updatedAt && (
         <div className="flex items-center gap-2">
           <span>🔄</span>
-          <span>Cập nhật: {lastUpdated}</span>
-        </div>
-      )}
-      {lifetimeAccess && (
-        <div className="flex items-center gap-2">
-          <span>♾️</span>
-          <span>Truy cập trọn đời</span>
+          <span>
+            Cập nhật:{" "}
+            {format(new Date(updatedAt), "dd/MM/yyyy", { locale: vi })}
+          </span>
         </div>
       )}
     </div>

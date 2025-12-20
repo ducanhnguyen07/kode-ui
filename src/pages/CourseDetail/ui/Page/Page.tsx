@@ -1,9 +1,11 @@
 import { CourseCurriculumTab } from "@/components/course/course-detail/course-curriculum-tab";
-import { CourseInstructorTab } from "@/components/course/course-detail/course-instructor-tab";
+import { CourseLecturerTab } from "@/components/course/course-detail/course-lecture-tab";
+
 import { CourseMetadata } from "@/components/course/course-detail/course-meta-data";
 import { CourseOverviewTab } from "@/components/course/course-detail/course-overview-tab";
 import { CourseSidebar } from "@/components/course/course-detail/course-sidebar";
 import apiClient from "@/shared/api/apiClient";
+import { Course } from "@/types/course";
 import { Badge } from "lucide-react";
 import React, { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -41,40 +43,6 @@ const TabsContent: FC<{
   className?: string;
 }> = ({ children, className }) => <div className={className}>{children}</div>;
 
-interface Lab {
-  id: number;
-  title: string;
-  short_description?: string;
-  description?: string;
-  duration?: string;
-  difficulty?: string;
-  order?: number;
-}
-
-interface Course {
-  id: number;
-  title: string;
-  description: string;
-  short_description: string;
-  level: string;
-  labs: Lab[];
-  duration?: string;
-  students_count?: number;
-  rating?: number;
-  category?: string;
-  instructor?: string;
-  instructor_bio?: string;
-  instructor_avatar?: string;
-  last_updated?: string;
-  language?: string;
-  prerequisites?: string[];
-  learning_outcomes?: string[];
-  price?: number;
-  discount_price?: number;
-  certificate?: boolean;
-  lifetime_access?: boolean;
-}
-
 const CourseDetailPage: FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
 
@@ -98,6 +66,7 @@ const CourseDetailPage: FC = () => {
         const url = `/courses/${courseId}/detail`;
         const response = await apiClient.get<Course>(url);
         setCourse(response.data);
+        // console.log("Dữ liệu khóa học đã được tải:", response.data);
       } catch (err: any) {
         console.error("Lỗi khi fetch dữ liệu khóa học:", err);
         const serverMessage = err.response?.data?.message || err.message;
@@ -150,8 +119,6 @@ const CourseDetailPage: FC = () => {
               <div className="mb-4 flex items-center gap-3">
                 <Badge>{course.level}</Badge>
                 {course.category && <Badge>{course.category}</Badge>}
-                {course.language && <Badge>🌐 {course.language}</Badge>}
-                {course.certificate && <Badge>📜 Chứng chỉ</Badge>}
               </div>
 
               <h1 className="text-foreground mb-4 text-4xl font-bold">
@@ -163,12 +130,9 @@ const CourseDetailPage: FC = () => {
               </p>
 
               <CourseMetadata
-                instructor={course.instructor}
-                duration={course.duration}
-                studentsCount={course.students_count}
-                rating={course.rating}
-                lastUpdated={course.last_updated}
-                lifetimeAccess={course.lifetime_access}
+                lecturer={course.lecturer}
+                studentsCount={course.studentsCount}
+                updatedAt={course.updatedAt}
               />
 
               <Tabs
@@ -214,11 +178,7 @@ const CourseDetailPage: FC = () => {
 
                 {activeTab === "overview" && (
                   <TabsContent value="overview" className="mt-2">
-                    <CourseOverviewTab
-                      description={course.description}
-                      learningOutcomes={course.learning_outcomes}
-                      prerequisites={course.prerequisites}
-                    />
+                    <CourseOverviewTab description={course.description} />
                   </TabsContent>
                 )}
 
@@ -233,11 +193,7 @@ const CourseDetailPage: FC = () => {
 
                 {activeTab === "instructor" && (
                   <TabsContent value="instructor" className="mt-2">
-                    <CourseInstructorTab
-                      instructor={course.instructor}
-                      instructorBio={course.instructor_bio}
-                      instructorAvatar={course.instructor_avatar}
-                    />
+                    <CourseLecturerTab lecturer={course.lecturer} />
                   </TabsContent>
                 )}
               </Tabs>
@@ -249,14 +205,8 @@ const CourseDetailPage: FC = () => {
                 title={course.title}
                 category={course.category}
                 level={course.level}
-                duration={course.duration}
                 labsCount={course.labs.length}
-                studentsCount={course.students_count}
-                price={course.price}
-                discountPrice={course.discount_price}
-                language={course.language}
-                certificate={course.certificate}
-                lifetimeAccess={course.lifetime_access}
+                studentsCount={course.studentsCount}
               />
             </div>
           </div>
