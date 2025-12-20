@@ -1,3 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+  }
+
+  .dark {
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+  }
+}
+
+.prose ul,
+.tiptap-viewer-container ul {
+  list-style-type: disc !important;
+  margin-left: 1.25rem !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.prose ol,
+.tiptap-viewer-container ol {
+  list-style-type: decimal !important;
+  margin-left: 1.25rem !important;
+}
+
+.prose li,
+.tiptap-viewer-container li {
+  display: list-item !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* Fix lỗi hiển thị Bold (in đậm) nếu bị mất */
+.prose strong,
+.tiptap-viewer-container strong {
+  font-weight: 700 !important;
+  color: inherit;
+}

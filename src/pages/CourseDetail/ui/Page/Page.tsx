@@ -1,56 +1,87 @@
+import { CourseCurriculumTab } from "@/components/course/course-detail/course-curriculum-tab";
+import { CourseInstructorTab } from "@/components/course/course-detail/course-instructor-tab";
+import { CourseMetadata } from "@/components/course/course-detail/course-meta-data";
+import { CourseOverviewTab } from "@/components/course/course-detail/course-overview-tab";
+import { CourseSidebar } from "@/components/course/course-detail/course-sidebar";
 import apiClient from "@/shared/api/apiClient";
+import { Badge } from "lucide-react";
 import React, { FC, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
-// --- Các UI Component (giữ nguyên) ---
-const Button: FC<{
-  children: React.ReactNode;
-  className?: string;
-  size?: string;
-}> = ({ children, className }) => (
-  <button
-    className={`rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 ${className}`}
-  >
-    {children}
-  </button>
-);
 const MainLayout: FC<{ children: React.ReactNode }> = ({ children }) => (
   <div>{children}</div>
 );
+
 const Tabs: FC<{
   children: React.ReactNode;
   defaultValue: string;
   className?: string;
+  onValueChange?: (value: string) => void;
 }> = ({ children }) => <div>{children}</div>;
+
+const TabsList: FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className,
+}) => <div className={`flex gap-2 border-b ${className}`}>{children}</div>;
+
+const TabsTrigger: FC<{
+  children: React.ReactNode;
+  value: string;
+  className?: string;
+  onClick?: () => void;
+}> = ({ children, className, onClick }) => (
+  <button className={`px-4 py-2 ${className}`} onClick={onClick}>
+    {children}
+  </button>
+);
+
 const TabsContent: FC<{
   children: React.ReactNode;
   value: string;
   className?: string;
 }> = ({ children, className }) => <div className={className}>{children}</div>;
-const FlaskConical: FC<{ className?: string }> = ({ className }) => (
-  <span className={className}>🧪</span>
-);
 
-// --- Định nghĩa Types (giữ nguyên) ---
 interface Lab {
   id: number;
   title: string;
+  short_description?: string;
+  description?: string;
+  duration?: string;
+  difficulty?: string;
+  order?: number;
 }
 
 interface Course {
   id: number;
   title: string;
   description: string;
+  short_description: string;
+  level: string;
   labs: Lab[];
+  duration?: string;
+  students_count?: number;
+  rating?: number;
+  category?: string;
+  instructor?: string;
+  instructor_bio?: string;
+  instructor_avatar?: string;
+  last_updated?: string;
+  language?: string;
+  prerequisites?: string[];
+  learning_outcomes?: string[];
+  price?: number;
+  discount_price?: number;
+  certificate?: boolean;
+  lifetime_access?: boolean;
 }
 
-// --- Component chính ---
 const CourseDetailPage: FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("overview");
 
   useEffect(() => {
     if (!courseId) {
@@ -64,20 +95,11 @@ const CourseDetailPage: FC = () => {
       setError(null);
 
       try {
-        // SỬA: Dùng path tương đối, không cần http://localhost... vì đã có baseURL trong apiClient
         const url = `/courses/${courseId}/detail`;
-        
-        // SỬA: Gọi qua apiClient và nhận response kiểu AxiosResponse<Course>
         const response = await apiClient.get<Course>(url);
-
-        // Axios tự động parse JSON và đưa vào response.data
-        // Nếu API trả về lỗi (4xx, 5xx), axios sẽ nhảy xuống catch, không cần check !response.ok
         setCourse(response.data);
-        
       } catch (err: any) {
         console.error("Lỗi khi fetch dữ liệu khóa học:", err);
-        
-        // Xử lý lỗi từ Axios (err.response chứa thông tin lỗi từ server trả về nếu có)
         const serverMessage = err.response?.data?.message || err.message;
         setError(serverMessage || "Đã có lỗi xảy ra. Vui lòng thử lại.");
       } finally {
@@ -88,7 +110,6 @@ const CourseDetailPage: FC = () => {
     fetchCourseData();
   }, [courseId]);
 
-  // --- Các phần render UI (giữ nguyên) ---
   if (loading) {
     return (
       <MainLayout>
@@ -124,58 +145,119 @@ const CourseDetailPage: FC = () => {
       <div className="to-background bg-gradient-to-r from-blue-50/10 via-blue-50/5 p-5">
         <div className="container mx-auto px-4 py-12">
           <div className="grid gap-8 lg:grid-cols-3">
-            {/* --- CỘT BÊN TRÁI (2/3 CHIỀU RỘNG) --- */}
+            {/* CỘT BÊN TRÁI */}
             <div className="lg:col-span-2">
+              <div className="mb-4 flex items-center gap-3">
+                <Badge>{course.level}</Badge>
+                {course.category && <Badge>{course.category}</Badge>}
+                {course.language && <Badge>🌐 {course.language}</Badge>}
+                {course.certificate && <Badge>📜 Chứng chỉ</Badge>}
+              </div>
+
               <h1 className="text-foreground mb-4 text-4xl font-bold">
                 {course.title}
               </h1>
-              <div
-                className="mb-6 text-lg text-gray-500"
-                dangerouslySetInnerHTML={{ __html: course.description }}
+
+              <p className="mb-6 text-lg text-gray-600">
+                {course.short_description}
+              </p>
+
+              <CourseMetadata
+                instructor={course.instructor}
+                duration={course.duration}
+                studentsCount={course.students_count}
+                rating={course.rating}
+                lastUpdated={course.last_updated}
+                lifetimeAccess={course.lifetime_access}
               />
-              <Tabs defaultValue="curriculum" className="w-full">
-                <TabsContent value="curriculum" className="mt-2">
-                  <div className="space-y-4">
-                    <div className="bg-card rounded-lg border">
-                      <div className="p-4">
-                        <h3 className="text-xl font-semibold">
-                          Nội dung khóa học
-                        </h3>
-                      </div>
-                      <div className="divide-y">
-                        {course.labs.map((lab) => (
-                          <Link
-                            key={lab.id}
-                            to={`/courses/${course.id}/labs/${lab.id}/start`}
-                            className="flex items-center gap-3 p-4 hover:bg-gray-50"
-                          >
-                            <FlaskConical className="text-blue-500" />
-                            <p>{lab.title}</p>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
+
+              <Tabs
+                defaultValue="overview"
+                className="w-full"
+                onValueChange={setActiveTab}
+              >
+                <TabsList className="mb-6">
+                  <TabsTrigger
+                    value="overview"
+                    className={
+                      activeTab === "overview"
+                        ? "border-b-2 border-blue-600 font-semibold"
+                        : ""
+                    }
+                    onClick={() => setActiveTab("overview")}
+                  >
+                    Tổng quan
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="curriculum"
+                    className={
+                      activeTab === "curriculum"
+                        ? "border-b-2 border-blue-600 font-semibold"
+                        : ""
+                    }
+                    onClick={() => setActiveTab("curriculum")}
+                  >
+                    Nội dung khóa học
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="instructor"
+                    className={
+                      activeTab === "instructor"
+                        ? "border-b-2 border-blue-600 font-semibold"
+                        : ""
+                    }
+                    onClick={() => setActiveTab("instructor")}
+                  >
+                    Giảng viên
+                  </TabsTrigger>
+                </TabsList>
+
+                {activeTab === "overview" && (
+                  <TabsContent value="overview" className="mt-2">
+                    <CourseOverviewTab
+                      description={course.description}
+                      learningOutcomes={course.learning_outcomes}
+                      prerequisites={course.prerequisites}
+                    />
+                  </TabsContent>
+                )}
+
+                {activeTab === "curriculum" && (
+                  <TabsContent value="curriculum" className="mt-2">
+                    <CourseCurriculumTab
+                      labs={course.labs}
+                      courseId={course.id}
+                    />
+                  </TabsContent>
+                )}
+
+                {activeTab === "instructor" && (
+                  <TabsContent value="instructor" className="mt-2">
+                    <CourseInstructorTab
+                      instructor={course.instructor}
+                      instructorBio={course.instructor_bio}
+                      instructorAvatar={course.instructor_avatar}
+                    />
+                  </TabsContent>
+                )}
               </Tabs>
             </div>
 
-            {/* --- CỘT BÊN PHẢI (1/3 CHIỀU RỘNG) --- */}
+            {/* CỘT BÊN PHẢI */}
             <div className="lg:col-span-1">
-              <div className="bg-card sticky top-4 overflow-hidden rounded-lg border shadow-lg">
-                <img
-                  src={
-                    "https://images.viblo.asia/fad7cf1a-772f-43e4-9042-e96d5d903b2b.png"
-                  }
-                  alt={course.title}
-                  className="h-48 w-full object-cover"
-                />
-                <div className="p-6">
-                  <Button className="w-full" size="lg">
-                    Bắt đầu học
-                  </Button>
-                </div>
-              </div>
+              <CourseSidebar
+                title={course.title}
+                category={course.category}
+                level={course.level}
+                duration={course.duration}
+                labsCount={course.labs.length}
+                studentsCount={course.students_count}
+                price={course.price}
+                discountPrice={course.discount_price}
+                language={course.language}
+                certificate={course.certificate}
+                lifetimeAccess={course.lifetime_access}
+              />
             </div>
           </div>
         </div>
