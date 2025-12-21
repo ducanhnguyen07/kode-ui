@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { Route, Routes } from "react-router-dom";
-import { Layout } from "@/app/Layout";
+import { Layout } from "@/app/layout";
 import {
   Home,
   NoMatch,
@@ -10,8 +10,8 @@ import {
   SubjectListPage,
 } from "@/pages";
 import { Lab, StartLab } from "@/pages/Lab";
-import ProtectedRoute from "./Layout/ui/ProtectedRoute";
-import { HistoryDetailPage, HistoryListPage } from "@/pages/History";
+import ProtectedRoute from "./layout/ui/ProtectedRoute";
+import { HistoryDetailPage, HistoryListPage } from "@/pages/history";
 
 const App: FC = () => {
   return (
@@ -50,8 +50,22 @@ const App: FC = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="history" element={<ProtectedRoute><HistoryListPage /></ProtectedRoute>} />
-          <Route path="history/:sessionId" element={<ProtectedRoute><HistoryDetailPage /></ProtectedRoute>} />
+          <Route
+            path="history"
+            element={
+              <ProtectedRoute>
+                <HistoryListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="history/:sessionId"
+            element={
+              <ProtectedRoute>
+                <HistoryDetailPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<NoMatch />} />
         </Route>
 
@@ -71,8 +85,7 @@ const App: FC = () => {
             </ProtectedRoute>
           }
         />
-        
-        
+
         <Route path="/login" element={<Login />} />
       </Routes>
     </>
