@@ -10,8 +10,8 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-import Console from "./Console";
-import { Question, QuestionProps } from "./Question";
+import Console from "./console";
+import { Question, QuestionProps } from "./question";
 
 import apiClient from "@/shared/api/apiClient";
 
