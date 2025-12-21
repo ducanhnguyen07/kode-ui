@@ -17,14 +17,14 @@ import { useNavigate, useParams } from "react-router-dom";
 interface UserLabSessionResponse {
   sessionId: number;
   status: string;
-  setupStartedAt: string;
+  startAt: string;
   socketUrl: string;
 }
 
 const StartLab: FC = () => {
   const { courseId, labId } = useParams<{ courseId: string; labId: string }>();
   const navigate = useNavigate();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, token } = useAppSelector((state) => state.auth);
 
   const [labDetail, setLabDetail] = useState<Lab | null>(null);
   const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
@@ -75,15 +75,29 @@ const StartLab: FC = () => {
 
       console.log("📦 Response:", response.data);
 
-      const { sessionId } = response.data;
+      const { sessionId, socketUrl } = response.data;
 
       if (!sessionId) {
         throw new Error("Không nhận được Session ID từ server.");
       }
 
-      console.log("✅ Session created:", sessionId);
+      if (!socketUrl) {
+        throw new Error("Không nhận được Socket URL từ server.");
+      }
 
-      navigate(`/labs/${labId}/setup/${sessionId}`);
+      console.log("✅ Session created:", sessionId);
+      console.log("🔌 Socket URL:", socketUrl);
+
+      // Thêm token vào socketUrl
+      const urlWithToken = token
+        ? `${socketUrl}${
+            socketUrl.includes("?") ? "&" : "?"
+          }token=${encodeURIComponent(token)}`
+        : socketUrl;
+
+      navigate(`/labs/${labId}/setup/${sessionId}`, {
+        state: { socketUrl: urlWithToken },
+      });
     } catch (err: any) {
       console.error("❌ Start lab error:", err);
       const message =
@@ -92,6 +106,7 @@ const StartLab: FC = () => {
         err.message ||
         "Không thể khởi tạo Lab.";
       setStartError(message);
+    } finally {
       setIsStarting(false);
     }
   };

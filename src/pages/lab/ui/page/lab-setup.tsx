@@ -1,6 +1,5 @@
 import { FC, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useAppSelector } from "@/app/hooks";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 
 import { getRandomQuote } from "../../data/quotes";
 import { LoadingHeader } from "../components/loading-header";
@@ -10,13 +9,21 @@ import { useLabSetupWebSocket } from "../../hooks/useLabSetupWebSocket";
 
 const LabSetup: FC = () => {
   const { labId, sessionId } = useParams();
-  const { token } = useAppSelector((state) => state.auth);
+  const location = useLocation();
+  const navigate = useNavigate();
   const [currentQuote] = useState(() => getRandomQuote());
+
+  const socketUrl = location.state?.socketUrl;
+
+  if (!socketUrl) {
+    navigate(`/courses`);
+    return null;
+  }
 
   const { progress, status } = useLabSetupWebSocket({
     sessionId,
     labId,
-    token,
+    socketUrl,
   });
 
   return (
