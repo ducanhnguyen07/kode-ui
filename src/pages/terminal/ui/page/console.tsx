@@ -8,8 +8,7 @@ import "xterm/css/xterm.css";
 interface ConsoleProps {
   labSessionId: number;
 }
-
-const Console: React.FC<ConsoleProps> = ({ labSessionId }) => {
+export const Console: React.FC<ConsoleProps> = ({ labSessionId }) => {
   const terminalRef = useRef<HTMLDivElement | null>(null);
   const termRef = useRef<Terminal | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
@@ -18,7 +17,6 @@ const Console: React.FC<ConsoleProps> = ({ labSessionId }) => {
   const { token } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
-  const [vmCreationProgress, setVmCreationProgress] = useState<number>(0);
   const [terminalReady, setTerminalReady] = useState<boolean>(false);
 
   useEffect(() => {
@@ -34,21 +32,18 @@ const Console: React.FC<ConsoleProps> = ({ labSessionId }) => {
     }
 
     if (!terminalRef.current || !labSessionId) {
-      console.error("❌ Missing requirements:", {
-        hasTerminalRef: !!terminalRef.current,
-        labSessionId,
-      });
+      console.error("❌ Missing requirements");
       return;
     }
 
     isInitializedRef.current = true;
-    console.log("🚀 Initializing terminal for session:", labSessionId);
-    console.log("🔑 Token available:", !!token);
+    console.log("🚀 Initializing terminal");
 
     const term = new Terminal({
       cursorBlink: true,
       fontFamily: "monospace",
       fontSize: 14,
+      disableStdin: false, // ✅ QUAN TRỌNG - cho phép input
       theme: {
         background: "#1f2937",
         foreground: "#d1d5db",
@@ -63,6 +58,12 @@ const Console: React.FC<ConsoleProps> = ({ labSessionId }) => {
     term.open(terminalRef.current);
     fitAddon.fit();
 
+    // ✅ FOCUS terminal
+    setTimeout(() => {
+      term.focus();
+      console.log("✅ Terminal focused and ready for input");
+    }, 100);
+
     const handleResize = () => {
       if (fitAddonRef.current) {
         fitAddonRef.current.fit();
@@ -73,8 +74,6 @@ const Console: React.FC<ConsoleProps> = ({ labSessionId }) => {
     const wsUrl = `ws://localhost:9998/ws/pod-logs?podName=vm-${labSessionId}&token=${encodeURIComponent(
       token,
     )}`;
-    console.log("🔗 Connecting WebSocket with token");
-
     const socket = new WebSocket(wsUrl);
     socketRef.current = socket;
 
@@ -86,18 +85,16 @@ const Console: React.FC<ConsoleProps> = ({ labSessionId }) => {
       try {
         const data = JSON.parse(event.data);
 
-        if (data.type === "progress") {
-          setVmCreationProgress(data.progress || 0);
-          term.write(`\r\n${data.message}\r\n`);
-        } else if (data.type === "terminal_ready") {
-          console.log("🎉 VM Ready! Switching to terminal mode");
+        if (data.type === "terminal_ready") {
+          console.log("🎉 VM Ready! Terminal mode enabled");
           term.write("\r\n🎉 VM Setup Complete!\r\n");
-          term.write(`\r\n${data.message}\r\n`);
-          term.write("⏳ Terminal ready. You can now type commands...\r\n\r\n");
-
+          term.write(`\r\n${data.message}\r\n\r\n`);
           setTerminalReady(true);
-          setVmCreationProgress(100);
+
+          // ✅ Focus lại sau khi ready
+          setTimeout(() => term.focus(), 100);
         } else if (
+          data.type === "progress" ||
           data.type === "info" ||
           data.type === "success" ||
           data.type === "error"
@@ -112,15 +109,9 @@ const Console: React.FC<ConsoleProps> = ({ labSessionId }) => {
     };
 
     socket.onclose = (event) => {
-      console.log("🔌 WebSocket closed:", event.code, event.reason);
-
+      console.log("🔌 WebSocket closed");
       if (event.code !== 1000) {
         term.write("\r\n❌ Connection closed.\r\n");
-
-        if (event.code === 1002 || event.code === 1006) {
-          term.write("⚠️ Authentication error. Redirecting to login...\r\n");
-          setTimeout(() => navigate("/login"), 2000);
-        }
       }
     };
 
@@ -129,42 +120,45 @@ const Console: React.FC<ConsoleProps> = ({ labSessionId }) => {
       term.write("\r\n❌ Connection error\r\n");
     };
 
+    // ✅ THÊM DEBUG LOG
     const onDataDisposable = term.onData((data) => {
-      if (terminalReady && socket.readyState === WebSocket.OPEN) {
+      console.log("🎹 Key pressed:", data, "charCode:", data.charCodeAt(0));
+      console.log("🔍 terminalReady:", terminalReady);
+      console.log("🔍 socket state:", socket.readyState);
+
+      if (socket.readyState === WebSocket.OPEN) {
+        console.log("✅ Sending to backend");
         socket.send(data);
+      } else {
+        console.warn(
+          "⚠️ Cannot send - terminalReady:",
+          terminalReady,
+          "socket:",
+          socket.readyState,
+        );
       }
     });
 
     return () => {
-      console.log("🧹 Cleanup on unmount");
+      console.log("🧹 Cleanup");
       onDataDisposable.dispose();
-
-      if (
-        socket.readyState === WebSocket.OPEN ||
-        socket.readyState === WebSocket.CONNECTING
-      ) {
-        socket.close(1000);
-      }
-
+      socket.close(1000);
       term.dispose();
       window.removeEventListener("resize", handleResize);
       isInitializedRef.current = false;
     };
   }, [token, labSessionId, navigate, terminalReady]);
 
-  if (!token) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <div className="text-white">Redirecting to login...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="relative h-full w-full">
-      <div ref={terminalRef} className="h-full w-full" />
+      <div
+        ref={terminalRef}
+        className="h-full w-full"
+        style={{
+          pointerEvents: "auto", // ✅ Đảm bảo nhận events
+          cursor: "text", // ✅ Hiển thị text cursor
+        }}
+      />
     </div>
   );
 };
-
-export default Console;
