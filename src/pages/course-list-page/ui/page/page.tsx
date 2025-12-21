@@ -24,7 +24,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import CourseCard from "@/components/course/course-card";
+import CourseCard from "@/pages/course-list-page/ui/component/course-card";
 
 const MainLayout: FC<{ children: React.ReactNode }> = ({ children }) => (
   <div>{children}</div>

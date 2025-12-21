@@ -1,14 +1,13 @@
-import { CourseCurriculumTab } from "@/components/course/course-detail/course-curriculum-tab";
-import { CourseLecturerTab } from "@/components/course/course-detail/course-lecture-tab";
-
-import { CourseMetadata } from "@/components/course/course-detail/course-meta-data";
-import { CourseOverviewTab } from "@/components/course/course-detail/course-overview-tab";
-import { CourseSidebar } from "@/components/course/course-detail/course-sidebar";
 import apiClient from "@/shared/api/apiClient";
 import { Course } from "@/types/course";
 import { Badge } from "lucide-react";
 import React, { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { CourseCurriculumTab } from "../components/course-curriculum-tab";
+import { CourseLecturerTab } from "../components/course-lecture-tab";
+import { CourseMetadata } from "../components/course-meta-data";
+import { CourseOverviewTab } from "../components/course-overview-tab";
+import { CourseSidebar } from "../components/course-sidebar";
 
 const MainLayout: FC<{ children: React.ReactNode }> = ({ children }) => (
   <div>{children}</div>

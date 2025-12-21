@@ -1,12 +1,12 @@
-import { Home } from "./Home";
-import { NoMatch } from "./NoMatch";
+import { Home } from "./home";
+import { NoMatch } from "./no-match";
 import { CoursesListPage } from "./course-list-page";
 import { CourseDetailPage } from "./course-detail";
-import Terminal from "./Terminal/ui/Page/Terminal";
-import { StaticLabResultPage } from "./Result";
+import Terminal from "./terminal/ui/Page/Terminal";
+import { StaticLabResultPage } from "./result";
 import { HistoryDetailPage, HistoryListPage } from "./history";
-import { SubjectListPage } from "./Subject";
-import Login from "./Login/ui/Page/Login";
+import { SubjectListPage } from "./subject";
+import Login from "./login/ui/Page/Login";
 
 export {
   Home,

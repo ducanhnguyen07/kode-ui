@@ -1,4 +1,4 @@
-import Lab from "./ui/Page/Lab";
-import StartLab from "./ui/Page/StartLab";
+import Lab from "./ui/page/lab";
+import StartLab from "./ui/page/start-lab";
 
 export { Lab, StartLab };

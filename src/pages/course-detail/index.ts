@@ -1,3 +1,3 @@
-import CourseDetailPage from "./ui/Page/Page";
+import CourseDetailPage from "./ui/page/page";
 
 export { CourseDetailPage };

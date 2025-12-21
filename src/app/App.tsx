@@ -9,9 +9,10 @@ import {
   Login,
   SubjectListPage,
 } from "@/pages";
-import { Lab, StartLab } from "@/pages/Lab";
+import { Lab, StartLab } from "@/pages/lab";
 import ProtectedRoute from "./layout/ui/ProtectedRoute";
 import { HistoryDetailPage, HistoryListPage } from "@/pages/history";
+import LabSetup from "@/pages/lab/ui/page/lab-setup";
 
 const App: FC = () => {
   return (
@@ -74,6 +75,15 @@ const App: FC = () => {
           element={
             <ProtectedRoute>
               <StartLab />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/labs/:labId/setup/:sessionId"
+          element={
+            <ProtectedRoute>
+              <LabSetup />
             </ProtectedRoute>
           }
         />
