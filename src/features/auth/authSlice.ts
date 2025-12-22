@@ -15,7 +15,6 @@ interface AuthState {
   error: string | null;
 }
 
-// Lấy token từ LocalStorage khi App khởi động (Persistence)
 const storedToken = localStorage.getItem("accessToken");
 const storedUser = localStorage.getItem("user");
 
@@ -35,12 +34,15 @@ const authSlice = createSlice({
       state.isLoading = true;
       state.error = null;
     },
-    loginSuccess: (state, action: PayloadAction<{ user: User; token: string }>) => {
+    loginSuccess: (
+      state,
+      action: PayloadAction<{ user: User; token: string }>,
+    ) => {
       state.isLoading = false;
       state.isAuthenticated = true;
       state.user = action.payload.user;
       state.token = action.payload.token;
-      
+
       // Lưu vào Storage (IO Operation)
       localStorage.setItem("accessToken", action.payload.token);
       localStorage.setItem("user", JSON.stringify(action.payload.user));
@@ -59,5 +61,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { loginStart, loginSuccess, loginFailure, logout } = authSlice.actions;
+export const { loginStart, loginSuccess, loginFailure, logout } =
+  authSlice.actions;
 export default authSlice.reducer;
