@@ -6,7 +6,7 @@ import Terminal from "./terminal/ui/page/terminal";
 import { StaticLabResultPage } from "./result";
 import { HistoryDetailPage, HistoryListPage } from "./history";
 import { SubjectListPage } from "./subject";
-import Login from "./login/ui/Page/Login";
+import Login from "./login/ui/page/login";
 
 export {
   Home,

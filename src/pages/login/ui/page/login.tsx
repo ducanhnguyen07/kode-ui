@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
 
-// Logic Redux
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
   loginStart,
@@ -24,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Eye, EyeOff, Loader2, GraduationCap } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const loginSchema = z.object({
@@ -69,17 +68,19 @@ const LoginPage: FC = () => {
   };
 
   return (
-    // Background: Màu xám xanh nhạt rất dịu
-    <div className="flex min-h-screen items-center justify-center bg-[#f8f9fb] bg-gradient-to-b from-white to-[#f0f2f5] p-4">
-      <Card className="w-full max-w-[400px] overflow-hidden rounded-xl border-none bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
-        <CardHeader className="space-y-4 pb-6 pt-10 text-center">
-          <div className="flex justify-center">
-            {/* Icon: Nền tròn xám nhạt đúng chuẩn UI trong ảnh */}
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
-              <GraduationCap className="h-6 w-6 text-slate-600" />
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-white via-cyan-50/30 to-cyan-100/50 p-4">
+      <Card className="w-full max-w-[400px] overflow-hidden border-white/40 bg-white/70 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-md">
+        <CardHeader className="space-y-2 pb-6 pt-10 text-center">
+          <div className="mb-2 flex justify-center">
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-tr from-cyan-50 to-white shadow-[0_0_20px_rgba(34,211,238,0.15)]">
+              <img
+                src="/favicon.png"
+                alt="System Logo"
+                className="h-16 w-16 object-contain"
+              />
             </div>
           </div>
-          <CardTitle className="text-[20px] font-bold tracking-tight text-[#0f172a]">
+          <CardTitle className="text-[22px] font-bold tracking-tight text-slate-700">
             Lab Platform
           </CardTitle>
         </CardHeader>
@@ -90,9 +91,9 @@ const LoginPage: FC = () => {
               {error && (
                 <Alert
                   variant="destructive"
-                  className="border-red-100 bg-red-50 py-2"
+                  className="border-red-100 bg-red-50/50 py-2 text-red-600"
                 >
-                  <AlertDescription className="text-xs font-medium text-red-600">
+                  <AlertDescription className="text-xs font-medium">
                     {error}
                   </AlertDescription>
                 </Alert>
@@ -103,18 +104,18 @@ const LoginPage: FC = () => {
                 name="username"
                 render={({ field }) => (
                   <FormItem className="space-y-1.5">
-                    <FormLabel className="text-[13px] font-bold text-slate-700">
+                    <FormLabel className="text-[13px] font-medium text-slate-600">
                       Tên đăng nhập
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Nhập tên đăng nhập"
-                        className="h-10 border-slate-200 bg-white text-[14px] placeholder:text-slate-400 focus-visible:ring-1 focus-visible:ring-slate-400"
+                        className="h-10 border-slate-100 bg-white shadow-sm transition-all focus-visible:border-cyan-300 focus-visible:ring-1 focus-visible:ring-cyan-300"
                         disabled={isLoading}
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage className="text-[11px]" />
+                    <FormMessage className="text-[11px] text-red-500" />
                   </FormItem>
                 )}
               />
@@ -124,7 +125,7 @@ const LoginPage: FC = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem className="space-y-1.5">
-                    <FormLabel className="text-[13px] font-bold text-slate-700">
+                    <FormLabel className="text-[13px] font-medium text-slate-600">
                       Mật khẩu
                     </FormLabel>
                     <FormControl>
@@ -132,13 +133,13 @@ const LoginPage: FC = () => {
                         <Input
                           type={showPassword ? "text" : "password"}
                           placeholder="Nhập mật khẩu"
-                          className="h-10 border-slate-200 bg-white pr-10 text-[14px] placeholder:text-slate-400 focus-visible:ring-1 focus-visible:ring-slate-400"
+                          className="h-10 border-slate-100 bg-white pr-10 shadow-sm transition-all focus-visible:border-cyan-300 focus-visible:ring-1 focus-visible:ring-cyan-300"
                           disabled={isLoading}
                           {...field}
                         />
                         <button
                           type="button"
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 transition-colors hover:text-cyan-500"
                           onClick={() => setShowPassword(!showPassword)}
                           disabled={isLoading}
                         >
@@ -150,22 +151,21 @@ const LoginPage: FC = () => {
                         </button>
                       </div>
                     </FormControl>
-                    <FormMessage className="text-[11px]" />
+                    <FormMessage className="text-[11px] text-red-500" />
                   </FormItem>
                 )}
               />
 
-              <div className="pt-2">
-                {/* Button: Chuyển sang màu Navy đen cực đậm (#0f172a) */}
+              <div className="pt-3">
                 <Button
                   type="submit"
-                  className="h-10 w-full bg-[#0f172a] text-[14px] font-medium text-white transition-all hover:bg-[#1e293b] active:scale-[0.98]"
+                  className="h-10 w-full bg-gradient-to-r from-cyan-400 to-cyan-500 text-[14px] font-semibold text-white shadow-[0_2px_10px_rgba(34,211,238,0.25)] transition-all hover:from-cyan-500 hover:to-cyan-600 hover:shadow-[0_2px_15px_rgba(34,211,238,0.35)] active:scale-[0.98]"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Đang đăng nhập...
+                      Đang xử lý...
                     </>
                   ) : (
                     "Đăng nhập"
@@ -177,9 +177,8 @@ const LoginPage: FC = () => {
         </Form>
       </Card>
 
-      {/* Footer: Text mờ phía dưới chân trang */}
-      <div className="absolute bottom-6 w-full text-center text-[11px] text-slate-400">
-        <p>© 2025 Lab Platform. All rights reserved.</p>
+      <div className="z-12 absolute bottom-6 w-full text-center text-sm font-medium text-slate-600">
+        <p>© 2025 System. All rights reserved.</p>
       </div>
     </div>
   );
